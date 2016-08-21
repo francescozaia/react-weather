@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	googleGeocodeURL = "http://maps.google.com/maps/api/geocode/json"
-	forecastURL      = "https://api.forecast.io/forecast/your-api-key-here/"
-	rootAssetPath    = "/path/to/react-weather"
+	googleGeocodeURL string = "http://maps.google.com/maps/api/geocode/json"
+	forecastAPIKEY   = ""
+	forecastURL      = "https://api.forecast.io/forecast/" + forecastAPIKEY + "/"
+	rootAssetPath    = "/Users/francesco.zaia/Development/react-weather"
+	port             = "2222"
 )
 
 type Location struct {
@@ -40,10 +42,13 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/weather/", weatherHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(path.Join(rootAssetPath, "www/static")))))
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	log.Println("listening on port " + port)
+	log.Fatal(http.ListenAndServe(":" + port, nil))
 }
 
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println(path.Join(rootAssetPath, "www/index.html"))
 	http.ServeFile(w, r, path.Join(rootAssetPath, "www/index.html"))
 }
 
@@ -54,6 +59,7 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 		if err := geocodeAddress(address, geo); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
+		log.Println("<--- Formatted Address ---> " + geo.Results[0].FormattedAddress)
 		location := geo.Results[0].Geometry.Location
 		var weather interface{}
 		if err := loadWeather(location, &weather); err != nil {
@@ -73,6 +79,7 @@ func geocodeAddress(address string, res *GeocodeResponse) (err error) {
 	q := url.Values{}
 	q.Add("address", address)
 	u.RawQuery = q.Encode()
+	log.Println("<--- Google localisation api call ---> " + u.String())
 	resp, err := http.Get(u.String())
 	if err != nil {
 		return err
@@ -88,9 +95,12 @@ func geocodeAddress(address string, res *GeocodeResponse) (err error) {
 
 func loadWeather(loc Location, res *interface{}) (err error) {
 	u := fmt.Sprintf("%s%f,%f", forecastURL, loc.Lat, loc.Lng)
+
+	log.Println("<--- Forecast api call ---> " + u)
 	parsed, _ := url.Parse(u)
 	q := url.Values{}
 	q.Add("exclude", "minutely,daily")
+	q.Add("lang", "it")
 	q.Add("units", "si")
 	parsed.RawQuery = q.Encode()
 	resp, err := http.Get(parsed.String())

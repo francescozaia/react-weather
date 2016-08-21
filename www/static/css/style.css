@@ -1,6 +1,6 @@
 body {
   background-color:#2C3E50;
-  font-family: 'Roboto', sans-serif;
+  font-family:  'Baloo Paaji', cursive;
   color:#ECF0F1;
   font-weight:300;
   margin: 0;
@@ -69,7 +69,7 @@ textarea:focus, input:focus{
     cursor:pointer;
 }
 .ww-ctemp {
-    font-size:3rem;
+    font-size:2rem;
     padding:0.5rem 2rem;
 }
 .ww-csum {

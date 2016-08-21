@@ -276,6 +276,6 @@ var WeatherWidget = React.createClass({
 });
 
 React.renderComponent(
-    <WeatherWidget initialAddress="Douglas, Isle of Man" />,
+    <WeatherWidget initialAddress="Taglio di Po, Rovigo" />,
     document.getElementById('container')
 );
