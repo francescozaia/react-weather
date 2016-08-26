@@ -12,9 +12,10 @@ import (
 
 const (
 	googleGeocodeURL string = "http://maps.google.com/maps/api/geocode/json"
-	forecastAPIKEY   = ""
+	forecastAPIKEY   = "4a701ea176ed29e3032ccc1fc97ec130"
 	forecastURL      = "https://api.forecast.io/forecast/" + forecastAPIKEY + "/"
-	rootAssetPath    = "/Users/francesco.zaia/Development/react-weather"
+	//rootAssetPath    = "/Users/francesco.zaia/Development/react-weather"
+	rootAssetPath	 = "C:\\Users\\Francesco\\Development\\react-weather"
 	port             = "2222"
 )
 

@@ -1,6 +1,10 @@
-/**
- * @jsx React.DOM
- */
+import React from 'react';
+import { render } from 'react-dom';
+var ReactDom = require('react-dom');
+var classNames = require('classnames');
+import SkyconsLib from 'skycons';
+let Skycons = SkyconsLib(window);
+
 
 function getFormattedTemperature(temperature) {
     if(temperature) {
@@ -9,10 +13,9 @@ function getFormattedTemperature(temperature) {
     return null;
 }
 
-var cx = React.addons.classSet;
+var cx = classNames;
 
 var CurrentStatus = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         color: React.PropTypes.string,
         temperature: React.PropTypes.number,
@@ -25,19 +28,19 @@ var CurrentStatus = React.createClass({
         };
     },
     componentDidMount: function() {
-        var node = this.refs.icon.getDOMNode();
+        var node = ReactDom.findDOMNode(this.refs.icon);
         this.skycons = new Skycons({ 'color': this.props.color });
         this.skycons.add(node, this.props.icon);
         this.skycons.play();
     },
     componentWillReceiveProps: function(nextProps) {
         if(nextProps.icon !== this.props.icon) {
-            var node = this.refs.icon.getDOMNode();
+            var node = ReactDom.findDOMNode(this.refs.icon);
             this.skycons.set(node, nextProps.icon);
         }
     },
     componentWillUnmount: function() {
-        this.skycons.remove(this.refs.icon.getDOMNode());
+        this.skycons.remove(ReactDom.findDOMNode(this.refs.icon));
     },
     render: function() {
         return (
@@ -51,7 +54,6 @@ var CurrentStatus = React.createClass({
 });
 
 var LocationSearchBar = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         visible: React.PropTypes.bool,
         onComplete: React.PropTypes.func,
@@ -59,7 +61,7 @@ var LocationSearchBar = React.createClass({
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        var node = this.refs.search.getDOMNode();
+        var node = ReactDom.findDOMNode(this.refs.search);
         var address = node.value.trim();
         if(address) {
             this.props.onComplete(address);
@@ -71,7 +73,7 @@ var LocationSearchBar = React.createClass({
     },
     componentDidUpdate: function() {
         if(this.props.visible) {
-            this.refs.search.getDOMNode().focus();
+            ReactDom.findDOMNode(this.refs.search).focus();
         }
     },
     render: function() {
@@ -81,18 +83,17 @@ var LocationSearchBar = React.createClass({
         });
         return (
             <form className={ classes } onSubmit={ this.handleSubmit }>
-                <input ref="search" 
-                    onClick={ this.handleClick }
-                    onBlur={ this.props.onBlur }
-                    type="input"
-                    placeholder="Enter address" />
+                <input ref="search"
+                       onClick={ this.handleClick }
+                       onBlur={ this.props.onBlur }
+                       type="input"
+                       placeholder="Enter address" />
             </form>
         );
     }
 });
 
 var LocationHeader = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         onClick: React.PropTypes.func,
         address: React.PropTypes.string
@@ -109,7 +110,7 @@ var LocationHeader = React.createClass({
         var scale = (maxv - minv) / (maxp - minp);
         var size = Math.exp(minv + scale * (pos - minp))
         return {
-              fontSize: size + 'rem'
+            fontSize: size + 'rem'
         };
     },
     render: function() {
@@ -122,7 +123,6 @@ var LocationHeader = React.createClass({
 });
 
 var HourlyOutlookRow = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         shouldAnimate: React.PropTypes.bool,
         color: React.PropTypes.string,
@@ -131,19 +131,19 @@ var HourlyOutlookRow = React.createClass({
         summary: React.PropTypes.string
     },
     componentDidMount: function() {
-        var node = this.refs.icon.getDOMNode();
+        var node = ReactDom.findDOMNode(this.refs.icon);
         this.skycons = new Skycons({ 'color': this.props.color });
         this.skycons.add(node, this.props.icon);
     },
     componentWillReceiveProps: function(nextProps) {
         if(nextProps.icon !== this.props.icon) {
-            var node = this.refs.icon.getDOMNode();
+            var node = ReactDom.findDOMNode(this.refs.icon);
             this.skycons.set(node, nextProps.icon);
         }
         nextProps.shouldAnimate ? this.skycons.play() : this.skycons.pause();
     },
     componentWillUnmount: function() {
-        this.skycons.remove(this.refs.icon.getDOMNode());
+        this.skycons.remove(ReactDom.findDOMNode(this.refs.icon));
     },
     render: function() {
         return (
@@ -158,7 +158,6 @@ var HourlyOutlookRow = React.createClass({
 });
 
 var HourlyOutlookTable = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         visible: React.PropTypes.bool,
         iconColor: React.PropTypes.string,
@@ -181,7 +180,7 @@ var HourlyOutlookTable = React.createClass({
             <div className={ 'ww-ht' + (this.props.visible ? ' show' : '') }>
                 <table className="ww-htb">
                     <tbody>
-                        { rows }
+                    { rows }
                     </tbody>
                 </table>
             </div>
@@ -190,7 +189,6 @@ var HourlyOutlookTable = React.createClass({
 });
 
 var WeatherWidget = React.createClass({
-    mixins: [React.addons.PureRenderMixin],
     propTypes: {
         initialAddress: React.PropTypes.string
     },
@@ -201,7 +199,7 @@ var WeatherWidget = React.createClass({
             current: {
                 summary: '',
                 icon: 'clear-day',
-                temperature: ''
+                temperature: 0
             },
             hourly: [],
             showSearch: false,
@@ -252,8 +250,8 @@ var WeatherWidget = React.createClass({
         });
         return (
             <div className={ classes }
-                onClick={ this.handleToggleHourly }>
-                <LocationSearchBar 
+                 onClick={ this.handleToggleHourly }>
+                <LocationSearchBar
                     visible={ this.state.showSearch }
                     onComplete={ this.handleLocationChange }
                     onBlur={ this.handleSearchBlur } />
@@ -266,7 +264,7 @@ var WeatherWidget = React.createClass({
                         icon={ this.state.current.icon }
                         summary={ this.state.current.summary } />
                 </div>
-                <HourlyOutlookTable 
+                <HourlyOutlookTable
                     visible={ this.state.showHourly }
                     iconColor='#fff'
                     data={ this.state.hourly } />
@@ -275,7 +273,7 @@ var WeatherWidget = React.createClass({
     }
 });
 
-React.renderComponent(
+render(
     <WeatherWidget initialAddress="Taglio di Po, Rovigo" />,
     document.getElementById('container')
 );
